@@ -806,6 +806,11 @@
     "@deck.gl/core" "^6.4.2"
     prop-types "^15.6.0"
 
+"@luma.gl/constants@^7.0.0-alpha.3":
+  version "7.0.0-alpha.3"
+  resolved "https://registry.yarnpkg.com/@luma.gl/constants/-/constants-7.0.0-alpha.3.tgz#c3b86a6c9acaff27fed887e9731a19d8fe7c562e"
+  integrity sha512-ZVaVt1dr5D3L7IRrjK9a7diIxjzX96suaFQBn9D3e+h1IjI0YA8RuO3U9/o1GHxO8N7FXmAUBVd0Kgrn/B7bOg==
+
 "@mapbox/geojson-area@0.2.2":
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/@mapbox/geojson-area/-/geojson-area-0.2.2.tgz#18d7814aa36bf23fbbcc379f8e26a22927debf10"

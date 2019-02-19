@@ -3,13 +3,14 @@ import DeckGL, { ScatterplotLayer } from 'deck.gl';
 import { StaticMap } from 'react-map-gl';
 import { MapboxLayer } from '@deck.gl/mapbox';
 import TileLayer from 'components/tile-layer';
+import BitmapLayer from 'components/bitmap-layer';
 
 const MAPBOX_TOKEN = "pk.eyJ1IjoiYWZpbGF0b3JlOTAiLCJhIjoiY2lqcml0bHoyMDBhZHZwbHhzM2Q1bnRwNSJ9.Zm2C1hNemolKnIAAWquGYg";
 
 const INITIAL_VIEW_STATE = {
     longitude: -74.50,
     latitude: 40,
-    zoom: 9
+    zoom: 2
 };
 
 export class Map extends React.Component {
@@ -25,6 +26,7 @@ export class Map extends React.Component {
     const deck = this._deck;
 
     map.addLayer(new MapboxLayer({id: 'my-scatterplot', deck}));
+    map.addLayer(new MapboxLayer({id: 'bitmap-layer', deck, map: this._map}));
   }
 
   render() {
@@ -59,7 +61,20 @@ export class Map extends React.Component {
           getLineColor: [192, 192, 192],
           getFillColor: [140, 170, 180],
           getTileData
-        })
+        }),
+        // new BitmapLayer({
+        //   id: 'bitmap-layer',
+        //   image: 'https://docs.mapbox.com/mapbox-gl-js/assets/radar.gif',
+        //   bitmapBounds: [
+        //     [-71.516, 37.936],
+        //     [-80.425, 37.936],
+        //     [-80.425, 46.437],
+        //     [-71.516, 46.437]
+        //   ],
+        //   desaturate: 0,
+        //   transparentColor: [0, 0, 0, 0],
+        //   tintColor: [255, 255, 255]
+        // })
     ];
 
     return (

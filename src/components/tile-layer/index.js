@@ -1,5 +1,5 @@
 import { CompositeLayer } from 'deck.gl';
-import { BitmapLayer } from '@deck.gl/experimental-layers';
+import BitmapLayer from 'components/bitmap-layer';
 import TileCache from './utils/tile-cache';
 
 const defaultProps = {
@@ -83,18 +83,34 @@ export default class TileLayer extends CompositeLayer {
     return z;
   }
 
+  tile2long(x, z) {
+    return (x / Math.pow(2, z) * 360 - 180);
+  }
+  
+  tile2lat(y, z) {
+    const n = Math.PI - 2 * Math.PI * y / Math.pow(2, z);
+    return (180 / Math.PI * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n))));
+  }
+
   renderLayers() {
     // eslint-disable-next-line no-unused-vars
     const { getTileData, renderSubLayers, visible, ...geoProps } = this.props;
-    const z = this.getLayerZoomLevel();
-
     return this.state.tiles.map(tile => {
+      const { x, y, z } = tile;
+      const topLeft = [this.tile2long(x, z), this.tile2lat(y, z)];
+      const topRight = [this.tile2long(x + 1, z), this.tile2lat(y, z)];
+      const bottomLeft = [this.tile2long(x, z), this.tile2lat(y + 1, z)];
+      const bottomRight = [this.tile2long(x + 1, z), this.tile2lat(y + 1, z)];
+      const bounds = [bottomRight, bottomLeft, topLeft, topRight];
+
       return new BitmapLayer({
         id: `${this.id}-${tile.x}-${tile.y}-${tile.z}`,
-        images: [`https://storage.googleapis.com/wri-public/Hansen17/tiles/hansen_world/v1/tc30/${tile.z}/${tile.x}/${tile.y}.png`]
+        image: `https://storage.googleapis.com/wri-public/Hansen17/tiles/hansen_world/v1/tc30/${tile.z}/${tile.x}/${tile.y}.png`,
+        bitmapBounds: bounds,
+        desaturate: 0,
+        transparentColor: [0, 0, 0, 0],
+        tintColor: [255, 255, 255]
       })
-      // return renderSubLayers({
-      // });
     });
   }
 }

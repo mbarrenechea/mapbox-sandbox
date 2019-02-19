@@ -44,6 +44,7 @@ export default class TileCache {
     const {_cache, _getTileData, _maxSize, _maxZoom, _minZoom} = this;
     this._markOldTiles();
     const tileIndices = getTileIndices(viewport, _maxZoom, _minZoom);
+
     if (!tileIndices || tileIndices.length === 0) {
       onUpdate(tileIndices);
       return;
