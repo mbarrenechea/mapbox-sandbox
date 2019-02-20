@@ -10,7 +10,7 @@ const MAPBOX_TOKEN = "pk.eyJ1IjoiYWZpbGF0b3JlOTAiLCJhIjoiY2lqcml0bHoyMDBhZHZwbHh
 const INITIAL_VIEW_STATE = {
     longitude: -74.50,
     latitude: 40,
-    zoom: 12
+    zoom: 10
 };
 
 export class Map extends React.Component {
@@ -41,7 +41,7 @@ export class Map extends React.Component {
         .then(response => {
           const src = URL.createObjectURL(response);
           const image = new Image();
-  
+
           image.src = src;
           return image;
           // image.onload = () => {
@@ -49,7 +49,7 @@ export class Map extends React.Component {
           //   resolve(image);
           //   URL.revokeObjectURL(src);
           // };
-  
+
           // image.onerror = () => {
           //   reject(new Error("Can't load image"));
           // };
@@ -73,6 +73,8 @@ export class Map extends React.Component {
         new TileLayer({
           id: 'my-tile-layer',
           stroked: false,
+          minZoom: 3,
+          maxZoom: 12,
           getLineColor: [192, 192, 192],
           getFillColor: [140, 170, 180],
           getTileData

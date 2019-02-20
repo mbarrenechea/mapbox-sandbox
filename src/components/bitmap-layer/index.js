@@ -24,6 +24,7 @@ import {Layer} from '@deck.gl/core';
 import {Model, Geometry, Texture2D, fp64, loadTextures} from 'luma.gl';
 import vs from './bitmap-layer-vertex';
 import fs from './bitmap-layer-fragment';
+import { Tracer } from 'chrome-trace-event';
 
 const {fp64LowPart} = fp64;
 
@@ -38,7 +39,7 @@ const defaultProps = {
   // Instead we need to manually dim/blend rgb values with a background color.
   transparentColor: {type: 'color', value: [0, 0, 0, 0]},
   tintColor: {type: 'color', value: [255, 255, 255]},
-  startDate: {type: 'number', value: 2017},
+  startDate: {type: 'number', value: 2001},
   endDate: {type: 'number', value: 2018}
 };
 
@@ -108,11 +109,11 @@ export default class BitmapLayer extends Layer {
     if (oldProps.tintColor !== tintColor) {
       model.setUniforms({tintColor});
     }
-    
+
     if (oldProps.startDate !== startDate) {
       model.setUniforms({startDate});
     }
-    
+
     if (oldProps.endDate !== endDate) {
       model.setUniforms({endDate});
     }
