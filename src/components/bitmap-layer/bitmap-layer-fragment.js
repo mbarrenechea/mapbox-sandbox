@@ -15,6 +15,7 @@ uniform vec3 tintColor;
 uniform float opacity;
 uniform float startDate;
 uniform float endDate;
+uniform float zoom;
 
 // apply desaturation
 vec3 color_desaturate(vec3 color) {
@@ -32,25 +33,28 @@ vec4 apply_opacity(vec3 color, float alpha) {
   return mix(transparentColor / 255.0, vec4(color, 1.0), alpha);
 }
 
-vec4 decodeFunction(vec3 color, float alpha, float year) {
-  if (year >= startDate && year <= endDate) {
-    color.r = 255. / 255.;
-    color.g = 103. / 255.;
-    color.b = 153. / 255.;
-    return vec4(color, alpha);
+vec4 decodeFunction(vec3 color, float year) {
+  float intensity = color.r * 255.;
+  // float exponent = zoom > 11. ? 0.3 + (zoom - 3.) / 20. : 1.;
+
+  if (year >= startDate && year <= endDate && year >= 2001.) {
+    color.r = 220. / 255.;
+    color.g = (72. - zoom + 102. - 3. * intensity / zoom) / 255.;
+    color.b = (33. - zoom + 153. - intensity / zoom) / 255.;
+    return vec4(color, color.r);
   } else {
-    return vec4(color, 0.);
+    return vec4(0., 0., 0., 0.);
   }
 }
 
 void main(void) {
   vec4 bitmapColor = texture2D(bitmapTexture, vTexCoord);
 
-  if (bitmapColor == vec4(0., 0., 0., 1.)) {
+  if ((bitmapColor.r * 255.) < 1.) {
     discard;
   }
-  
+
   float year = 2000.0 + (bitmapColor.b * 255.);
-  gl_FragColor = decodeFunction(bitmapColor.rgb, 0.5, year);
+  gl_FragColor = decodeFunction(bitmapColor.rgb, year);
 }
 `;

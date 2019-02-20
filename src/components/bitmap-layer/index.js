@@ -24,7 +24,6 @@ import {Layer} from '@deck.gl/core';
 import {Model, Geometry, Texture2D, fp64, loadTextures} from 'luma.gl';
 import vs from './bitmap-layer-vertex';
 import fs from './bitmap-layer-fragment';
-import { Tracer } from 'chrome-trace-event';
 
 const {fp64LowPart} = fp64;
 
@@ -40,7 +39,8 @@ const defaultProps = {
   transparentColor: {type: 'color', value: [0, 0, 0, 0]},
   tintColor: {type: 'color', value: [255, 255, 255]},
   startDate: {type: 'number', value: 2001},
-  endDate: {type: 'number', value: 2018}
+  endDate: {type: 'number', value: 2018},
+  zoom: {type: 'number', value: 0},
 };
 
 /*
@@ -90,7 +90,7 @@ export default class BitmapLayer extends Layer {
     }
 
     const {model} = this.state;
-    const {bitmapBounds, desaturate, transparentColor, tintColor, startDate, endDate} = props;
+    const {bitmapBounds, desaturate, transparentColor, tintColor, startDate, endDate, zoom} = props;
     const attributeManager = this.getAttributeManager();
 
     if (oldProps.bitmapBounds !== bitmapBounds) {
@@ -116,6 +116,10 @@ export default class BitmapLayer extends Layer {
 
     if (oldProps.endDate !== endDate) {
       model.setUniforms({endDate});
+    }
+    
+    if (oldProps.zoom !== zoom) {
+      model.setUniforms({zoom});
     }
   }
 

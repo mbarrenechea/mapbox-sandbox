@@ -99,7 +99,6 @@ export default class TileLayer extends CompositeLayer {
     const {getTileData, renderSubLayers, visible, ...geoProps} = this.props;
     const zoomLevel = this.getLayerZoomLevel();
 
-
     return this.state.tiles.map(tile => {
       const { x, y, z } = tile;
       const topLeft = [this.tile2long(x, z), this.tile2lat(y, z)];
@@ -115,7 +114,10 @@ export default class TileLayer extends CompositeLayer {
         desaturate: 0,
         transparentColor: [0, 0, 0, 0],
         visible: visible && (!this.state.isLoaded || z === zoomLevel),
-        tintColor: [255, 255, 255]
+        tintColor: [255, 255, 255],
+        zoom: zoomLevel,
+        endDate: this.props.endDate,
+        fp64: true
       })
     });
   }

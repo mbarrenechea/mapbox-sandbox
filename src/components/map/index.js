@@ -8,13 +8,15 @@ import BitmapLayer from 'components/bitmap-layer';
 const MAPBOX_TOKEN = "pk.eyJ1IjoiYWZpbGF0b3JlOTAiLCJhIjoiY2lqcml0bHoyMDBhZHZwbHhzM2Q1bnRwNSJ9.Zm2C1hNemolKnIAAWquGYg";
 
 const INITIAL_VIEW_STATE = {
-    longitude: -74.50,
-    latitude: 40,
-    zoom: 10
+    longitude: -109.66698,
+    latitude: 60.74128,
+    zoom: 9
 };
 
 export class Map extends React.Component {
-  state = {};
+  state = {
+    endDate: 2018
+  };
 
   // DeckGL and mapbox will both draw into this WebGL context
   _onWebGLInitialized = (gl) => {
@@ -27,6 +29,12 @@ export class Map extends React.Component {
 
     map.addLayer(new MapboxLayer({id: 'my-scatterplot', deck}));
     map.addLayer(new MapboxLayer({id: 'bitmap-layer', deck, map: this._map}));
+  }
+
+  componentDidMount() {
+    // setInterval(() => {
+    //   this.setState(state => ({ endDate: state.endDate >= 2018 ? 2001 : state.endDate + 1 })); 
+    // }, 1000);
   }
 
   render() {
@@ -77,7 +85,8 @@ export class Map extends React.Component {
           maxZoom: 12,
           getLineColor: [192, 192, 192],
           getFillColor: [140, 170, 180],
-          getTileData
+          getTileData,
+          endDate: this.state.endDate
         }),
         // new BitmapLayer({
         //   id: 'bitmap-layer',
