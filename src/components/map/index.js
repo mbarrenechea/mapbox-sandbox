@@ -3,7 +3,6 @@ import DeckGL, { ScatterplotLayer } from 'deck.gl';
 import { StaticMap } from 'react-map-gl';
 import { MapboxLayer } from '@deck.gl/mapbox';
 import TileLayer from 'components/tile-layer';
-import BitmapLayer from 'components/bitmap-layer';
 
 const MAPBOX_TOKEN = "pk.eyJ1IjoiYWZpbGF0b3JlOTAiLCJhIjoiY2lqcml0bHoyMDBhZHZwbHhzM2Q1bnRwNSJ9.Zm2C1hNemolKnIAAWquGYg";
 
@@ -34,14 +33,13 @@ export class Map extends React.Component {
   componentDidMount() {
     // setInterval(() => {
     //   this.setState(state => ({ endDate: state.endDate >= 2018 ? 2001 : state.endDate + 1 })); 
-    // }, 1000);
+    // }, 50);
   }
 
   render() {
     const { gl } = this.state;
 
     function getTileData({x, y, z}) {
-      // const mapSource = `https://a.tiles.mapbox.com/v4/mapbox.mapbox-streets-v7/${z}/${x}/${y}.vector.pbf?access_token=${MAPBOX_TOKEN}`;
       const mapSource = `https://storage.googleapis.com/wri-public/Hansen17/tiles/hansen_world/v1/tc30/${z}/${x}/${y}.png`;
 
       return fetch(mapSource)
@@ -52,21 +50,8 @@ export class Map extends React.Component {
 
           image.src = src;
           return image;
-          // image.onload = () => {
-          //   image.crossOrigin = '';
-          //   resolve(image);
-          //   URL.revokeObjectURL(src);
-          // };
-
-          // image.onerror = () => {
-          //   reject(new Error("Can't load image"));
-          // };
         })
     }
-
-    // function vectorTileToGeoJSON(buffer, x, y, z) {
-    //   console.log(buffer);
-    // }
 
     const layers = [
         new ScatterplotLayer({
@@ -87,20 +72,7 @@ export class Map extends React.Component {
           getFillColor: [140, 170, 180],
           getTileData,
           endDate: this.state.endDate
-        }),
-        // new BitmapLayer({
-        //   id: 'bitmap-layer',
-        //   image: 'https://docs.mapbox.com/mapbox-gl-js/assets/radar.gif',
-        //   bitmapBounds: [
-        //     [-71.516, 37.936],
-        //     [-80.425, 37.936],
-        //     [-80.425, 46.437],
-        //     [-71.516, 46.437]
-        //   ],
-        //   desaturate: 0,
-        //   transparentColor: [0, 0, 0, 0],
-        //   tintColor: [255, 255, 255]
-        // })
+        })
     ];
 
     return (

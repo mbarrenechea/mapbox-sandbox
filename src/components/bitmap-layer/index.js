@@ -21,7 +21,8 @@
 /* global Image, HTMLCanvasElement */
 import GL from '@luma.gl/constants';
 import {Layer} from '@deck.gl/core';
-import {Model, Geometry, Texture2D, fp64, loadTextures} from 'luma.gl';
+import {Model, Geometry, Texture2D, fp64} from 'luma.gl';
+import {loadImage} from '@loaders.gl/core';
 import vs from './bitmap-layer-vertex';
 import fs from './bitmap-layer-fragment';
 
@@ -37,10 +38,7 @@ const defaultProps = {
   // alpha is not effective when blending the bitmap layers with the base map.
   // Instead we need to manually dim/blend rgb values with a background color.
   transparentColor: {type: 'color', value: [0, 0, 0, 0]},
-  tintColor: {type: 'color', value: [255, 255, 255]},
-  startDate: {type: 'number', value: 2001},
-  endDate: {type: 'number', value: 2018},
-  zoom: {type: 'number', value: 0},
+  tintColor: {type: 'color', value: [255, 255, 255]}
 };
 
 /*
@@ -57,8 +55,12 @@ export default class BitmapLayer extends Layer {
 
   initializeState() {
     const attributeManager = this.getAttributeManager();
-    const positions = [1, -1, 0, -1, -1, 0, -1, 1, 0, 1, 1, 0];
-    const positions64xyLow = [1, -1, -1, -1, -1, 1, 1, 1];
+    /*
+      -1,1  ---  1,1
+        |         |
+      -1,-1 --- 1,-1
+     */
+    const positions = [-1, -1, 0, -1, 1, 0, 1, 1, 0, 1, -1, 0];
 
     attributeManager.add({
       positions: {
@@ -67,9 +69,9 @@ export default class BitmapLayer extends Layer {
         value: new Float32Array(positions)
       },
       positions64xyLow: {
-        size: 2,
+        size: 3,
         update: this.calculatePositions64xyLow,
-        value: new Float32Array(positions64xyLow)
+        value: new Float32Array(positions)
       }
     });
   }
@@ -86,44 +88,68 @@ export default class BitmapLayer extends Layer {
     }
 
     if (props.image !== oldProps.image) {
-      this.loadImage();
+      this.loadTexture();
     }
 
-    const {model} = this.state;
-    const {bitmapBounds, desaturate, transparentColor, tintColor, startDate, endDate, zoom} = props;
     const attributeManager = this.getAttributeManager();
 
-    if (oldProps.bitmapBounds !== bitmapBounds) {
+    if (props.bitmapBounds !== oldProps.bitmapBounds) {
+      this.setState({
+        positions: this._getPositionsFromBounds(props.bitmapBounds)
+      });
       attributeManager.invalidate('positions');
       attributeManager.invalidate('positions64xyLow');
     }
+  }
 
-    if (oldProps.desaturate !== desaturate) {
-      model.setUniforms({desaturate});
+  _getPositionsFromBounds(bitmapBounds) {
+    const positions = new Array(12);
+    // bitmapBounds as [minX, minY, maxX, maxY]
+    if (Number.isFinite(bitmapBounds[0])) {
+      /*
+        (minX0, maxY3) ---- (maxX2, maxY3)
+               |                  |
+               |                  |
+               |                  |
+        (minX0, minY1) ---- (maxX2, minY1)
+     */
+      positions[0] = bitmapBounds[0];
+      positions[1] = bitmapBounds[1];
+      positions[2] = 0;
+
+      positions[3] = bitmapBounds[0];
+      positions[4] = bitmapBounds[3];
+      positions[5] = 0;
+
+      positions[6] = bitmapBounds[2];
+      positions[7] = bitmapBounds[3];
+      positions[8] = 0;
+
+      positions[9] = bitmapBounds[2];
+      positions[10] = bitmapBounds[1];
+      positions[11] = 0;
+    } else {
+      // [[minX, minY], [minX, maxY], [maxX, maxY], [maxX, minY]]
+      for (let i = 0; i < bitmapBounds.length; i++) {
+        positions[i * 3 + 0] = bitmapBounds[i][0];
+        positions[i * 3 + 1] = bitmapBounds[i][1];
+        positions[i * 3 + 2] = bitmapBounds[i][2] || 0;
+      }
     }
 
-    if (oldProps.transparentColor !== transparentColor) {
-      model.setUniforms({transparentColor});
-    }
-
-    if (oldProps.tintColor !== tintColor) {
-      model.setUniforms({tintColor});
-    }
-
-    if (oldProps.startDate !== startDate) {
-      model.setUniforms({startDate});
-    }
-
-    if (oldProps.endDate !== endDate) {
-      model.setUniforms({endDate});
-    }
-    
-    if (oldProps.zoom !== zoom) {
-      model.setUniforms({zoom});
-    }
+    return positions;
   }
 
   _getModel(gl) {
+    if (!gl) {
+      return null;
+    }
+
+    /*
+      0,1 --- 1,1
+       |       |
+      0,0 --- 1,0
+    */
     return new Model(
       gl,
       Object.assign({}, this.getShaders(), {
@@ -133,7 +159,7 @@ export default class BitmapLayer extends Layer {
           drawMode: GL.TRIANGLE_FAN,
           vertexCount: 4,
           attributes: {
-            texCoords: new Float32Array([1, 0, 0, 0, 0, 1, 1, 1])
+            texCoords: new Float32Array([0, 0, 0, 1, 1, 1, 1, 0])
           }
         }),
         isInstanced: false
@@ -142,28 +168,38 @@ export default class BitmapLayer extends Layer {
   }
 
   draw({uniforms}) {
-    const {bitmapTexture} = this.state;
+    const {bitmapTexture, model} = this.state;
+    const {desaturate, transparentColor, tintColor, startDate, endDate, zoom} = this.props;
 
     // // TODO fix zFighting
     // Render the image
-    if (bitmapTexture) {
-      this.state.model.render(
+    if (bitmapTexture && model) {
+      model.render(
         Object.assign({}, uniforms, {
-          bitmapTexture
+          bitmapTexture,
+          desaturate,
+          transparentColor,
+          tintColor,
+          startDate,
+          endDate,
+          zoom
         })
       );
     }
   }
 
-  loadImage() {
+  loadTexture() {
     const {gl} = this.context;
     const {image} = this.props;
 
     if (typeof image === 'string') {
-      loadTextures(this.context.gl, {
-        urls: [image]
-      }).then(([texture]) => {
-        this.setState({bitmapTexture: texture});
+      loadImage(image).then(data => {
+        this.setState({bitmapTexture: new Texture2D(gl, { data, border: 0, parameters: {
+          [GL.TEXTURE_MAG_FILTER]: GL.NEAREST,
+          [GL.TEXTURE_MIN_FILTER]: GL.NEAREST,
+          [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
+          [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE
+        } })});
       });
     } else if (image instanceof Texture2D) {
       this.setState({bitmapTexture: image});
@@ -172,46 +208,18 @@ export default class BitmapLayer extends Layer {
       image instanceof Image ||
       image instanceof HTMLCanvasElement
     ) {
-      this.setState({bitmapTexture: new Texture2D(gl, {data: image})});
+      this.setState({bitmapTexture: new Texture2D(gl, {data: image, border: 0, parameters: {
+        [GL.TEXTURE_MAG_FILTER]: GL.NEAREST,
+        [GL.TEXTURE_MIN_FILTER]: GL.NEAREST,
+        [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
+        [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE
+      }})});
     }
   }
 
-  calculatePositions(attribute) {
-    const {bitmapBounds} = this.props;
-    const {value} = attribute;
-
-    // bitmapBounds as [right, bottom, left, top]
-    if (Number.isFinite(bitmapBounds[0])) {
-      /*
-        (l2, t3) ----- (r2, t3)
-           |              |
-           |              |
-           |              |
-        (l2, b1) ----- (r0, b1)
-     */
-      value[0] = bitmapBounds[0];
-      value[1] = bitmapBounds[1];
-      value[2] = 0;
-
-      value[3] = bitmapBounds[2];
-      value[4] = bitmapBounds[1];
-      value[5] = 0;
-
-      value[6] = bitmapBounds[2];
-      value[7] = bitmapBounds[3];
-      value[8] = 0;
-
-      value[9] = bitmapBounds[0];
-      value[10] = bitmapBounds[3];
-      value[11] = 0;
-    } else {
-      // [[x, y], ...] or [[x, y, z], ...]
-      for (let i = 0; i < bitmapBounds.length; i++) {
-        value[i * 3 + 0] = bitmapBounds[i][0];
-        value[i * 3 + 1] = bitmapBounds[i][1];
-        value[i * 3 + 2] = Number.isFinite(bitmapBounds[i][2]) ? bitmapBounds[i][2] : 0;
-      }
-    }
+  calculatePositions({value}) {
+    const {positions} = this.state;
+    value.set(positions);
   }
 
   calculatePositions64xyLow(attribute) {
@@ -223,36 +231,8 @@ export default class BitmapLayer extends Layer {
       return;
     }
 
-    const {bitmapBounds} = this.props;
     const {value} = attribute;
-
-    // bitmapBounds as [left, bottom, right, top]
-    if (Number.isFinite(bitmapBounds[0])) {
-      /*
-        (l2, t3) ----- (r2, t3)
-           |              |
-           |              |
-           |              |
-        (l2, b1) ----- (r0, b1)
-     */
-      value[0] = fp64LowPart(bitmapBounds[0]);
-      value[1] = fp64LowPart(bitmapBounds[1]);
-
-      value[2] = fp64LowPart(bitmapBounds[2]);
-      value[3] = fp64LowPart(bitmapBounds[1]);
-
-      value[4] = fp64LowPart(bitmapBounds[2]);
-      value[5] = fp64LowPart(bitmapBounds[3]);
-
-      value[6] = fp64LowPart(bitmapBounds[0]);
-      value[7] = fp64LowPart(bitmapBounds[3]);
-    } else {
-      // [[x, y], ...] or [[x, y, z], ...]
-      for (let i = 0; i < bitmapBounds.length; i++) {
-        value[i * 3 + 0] = fp64LowPart(bitmapBounds[i][0]);
-        value[i * 3 + 1] = fp64LowPart(bitmapBounds[i][1]);
-      }
-    }
+    value.set(this.state.positions.map(fp64LowPart));
   }
 }
 

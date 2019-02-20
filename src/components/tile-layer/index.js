@@ -105,8 +105,12 @@ export default class TileLayer extends CompositeLayer {
       const topRight = [this.tile2long(x + 1, z), this.tile2lat(y, z)];
       const bottomLeft = [this.tile2long(x, z), this.tile2lat(y + 1, z)];
       const bottomRight = [this.tile2long(x + 1, z), this.tile2lat(y + 1, z)];
-      const bounds = [bottomRight, bottomLeft, topLeft, topRight];
+      const bounds = [bottomLeft, topLeft, topRight, bottomRight];
 
+      // Supported formats:
+      // - Coordinates of the bounding box of the bitmap `[minX, minY, maxX, maxY]`
+      // - Coordinates of four corners of the bitmap, should follow the sequence of `[[minX, minY], [minX, maxY], [maxX, maxY], [maxX, minY]]` 
+      // each position could be `[x, y]` or `[x, y, z]` format. 
       return new BitmapLayer({
         id: `${this.id}-${x}-${y}-${z}`,
         image: `https://storage.googleapis.com/wri-public/Hansen17/tiles/hansen_world/v1/tc30/${z}/${x}/${y}.png`,
