@@ -56,33 +56,33 @@ void main(void) {
   gl_FragColor = picking_filterPickingColor(gl_FragColor);
 }
 
-// // decode 
-// decodeFunction(data, w, h, z, params) {
-//     const components = 4;
-//     const imgData = data;
-//     const myScale = this.getScale(z);
+// decode 
+decodeFunction(data, w, h, z, params) {
+    const components = 4;
+    const imgData = data;
+    const myScale = this.getScale(z);
 
-//     // const { startDate, endDate } = params;
-//     const yearStart = 2001;
-//     const yearEnd = 2018;
+    // const { startDate, endDate } = params;
+    const yearStart = 2001;
+    const yearEnd = 2018;
 
-//     for (let i = 0; i < w; ++i) {
-//       for (let j = 0; j < h; ++j) {
-//         const pixelPos = (j * w + i) * components;
-//         const yearLoss = 2000 + imgData[pixelPos + 2];
-//         if (yearLoss >= yearStart && yearLoss <= yearEnd) {
-//           const intensity = imgData[pixelPos];
-//           const scaleIntensity = myScale(intensity);
-//           imgData[pixelPos] = 220;
-//           imgData[pixelPos + 1] = 72 - z + 102 - 3 * scaleIntensity / z;
-//           imgData[pixelPos + 2] = 33 - z + 153 - intensity / z;
-//           imgData[pixelPos + 3] = z < 13 ? scaleIntensity : intensity;
-//         } else {
-//           imgData[pixelPos + 3] = 0;
-//         }
-//       }
-//     }
-//   };
+    for (let i = 0; i < w; ++i) {
+      for (let j = 0; j < h; ++j) {
+        const pixelPos = (j * w + i) * components;
+        const yearLoss = 2000 + imgData[pixelPos + 2];
+        if (yearLoss >= yearStart && yearLoss <= yearEnd) {
+          const intensity = imgData[pixelPos];
+          const scaleIntensity = myScale(intensity);
+          imgData[pixelPos] = 220;
+          imgData[pixelPos + 1] = 72 - z + 102 - 3 * scaleIntensity / z;
+          imgData[pixelPos + 2] = 33 - z + 153 - intensity / z;
+          imgData[pixelPos + 3] = z < 13 ? scaleIntensity : intensity;
+        } else {
+          imgData[pixelPos + 3] = 0;
+        }
+      }
+    }
+  };
 
 //   getExp(z) { 
 //     return z < 11 ? 0.3 + (z - 3) / 20 : 1;

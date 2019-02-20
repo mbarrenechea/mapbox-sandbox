@@ -33,12 +33,14 @@ vec4 apply_opacity(vec3 color, float alpha) {
 }
 
 vec4 decodeFunction(vec3 color, float alpha, float year) {
-  if (year <= startDate && year >= endDate) {
+  if (year >= startDate && year <= endDate) {
     color.r = 255. / 255.;
     color.g = 103. / 255.;
     color.b = 153. / 255.;
+    return vec4(color, alpha);
+  } else {
+    return vec4(color, 0.);
   }
-  return vec4(color, alpha);
 }
 
 void main(void) {
@@ -48,7 +50,7 @@ void main(void) {
     discard;
   }
   
-  float year = 2000.0 + bitmapColor.b;
+  float year = 2000.0 + (bitmapColor.b * 255.);
   gl_FragColor = decodeFunction(bitmapColor.rgb, 0.5, year);
 }
 `;

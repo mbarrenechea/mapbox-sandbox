@@ -10,7 +10,7 @@ const MAPBOX_TOKEN = "pk.eyJ1IjoiYWZpbGF0b3JlOTAiLCJhIjoiY2lqcml0bHoyMDBhZHZwbHh
 const INITIAL_VIEW_STATE = {
     longitude: -74.50,
     latitude: 40,
-    zoom: 3
+    zoom: 12
 };
 
 export class Map extends React.Component {
