@@ -29,7 +29,7 @@ const App = ({data, viewport}) => {
 
 ### Data
 
-##### `bitmap` (String|Texture2D|Image|HTMLCanvasElement)
+##### `image` (String|Texture2D|Image|HTMLCanvasElement)
 
 - Default `null`.
 

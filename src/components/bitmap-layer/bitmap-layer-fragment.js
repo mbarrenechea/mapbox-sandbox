@@ -13,6 +13,8 @@ uniform float desaturate;
 uniform vec4 transparentColor;
 uniform vec3 tintColor;
 uniform float opacity;
+uniform float startDate;
+uniform float endDate;
 
 // apply desaturation
 vec3 color_desaturate(vec3 color) {
@@ -30,19 +32,23 @@ vec4 apply_opacity(vec3 color, float alpha) {
   return mix(transparentColor / 255.0, vec4(color, 1.0), alpha);
 }
 
+vec4 decodeFunction(vec3 color, float alpha, float year) {
+  if (year <= startDate && year >= endDate) {
+    color.r = 255. / 255.;
+    color.g = 103. / 255.;
+    color.b = 153. / 255.;
+  }
+  return vec4(color, alpha);
+}
+
 void main(void) {
   vec4 bitmapColor = texture2D(bitmapTexture, vTexCoord);
 
   if (bitmapColor == vec4(0., 0., 0., 1.)) {
     discard;
   }
-
-  gl_FragColor = apply_opacity(color_tint(color_desaturate(bitmapColor.rgb)), bitmapColor.a * opacity);
-
-  // use highlight color if this fragment belongs to the selected object.
-  gl_FragColor = picking_filterHighlightColor(gl_FragColor);
-
-  // use picking color if rendering to picking FBO.
-  gl_FragColor = picking_filterPickingColor(gl_FragColor);
+  
+  float year = 2000.0 + bitmapColor.b;
+  gl_FragColor = decodeFunction(bitmapColor.rgb, 0.5, year);
 }
 `;

@@ -37,7 +37,9 @@ const defaultProps = {
   // alpha is not effective when blending the bitmap layers with the base map.
   // Instead we need to manually dim/blend rgb values with a background color.
   transparentColor: {type: 'color', value: [0, 0, 0, 0]},
-  tintColor: {type: 'color', value: [255, 255, 255]}
+  tintColor: {type: 'color', value: [255, 255, 255]},
+  startDate: {type: 'number', value: 2017},
+  endDate: {type: 'number', value: 2018}
 };
 
 /*
@@ -87,7 +89,7 @@ export default class BitmapLayer extends Layer {
     }
 
     const {model} = this.state;
-    const {bitmapBounds, desaturate, transparentColor, tintColor} = props;
+    const {bitmapBounds, desaturate, transparentColor, tintColor, startDate, endDate} = props;
     const attributeManager = this.getAttributeManager();
 
     if (oldProps.bitmapBounds !== bitmapBounds) {
@@ -105,6 +107,14 @@ export default class BitmapLayer extends Layer {
 
     if (oldProps.tintColor !== tintColor) {
       model.setUniforms({tintColor});
+    }
+    
+    if (oldProps.startDate !== startDate) {
+      model.setUniforms({startDate});
+    }
+    
+    if (oldProps.endDate !== endDate) {
+      model.setUniforms({endDate});
     }
   }
 

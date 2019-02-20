@@ -10,7 +10,7 @@ const MAPBOX_TOKEN = "pk.eyJ1IjoiYWZpbGF0b3JlOTAiLCJhIjoiY2lqcml0bHoyMDBhZHZwbHh
 const INITIAL_VIEW_STATE = {
     longitude: -74.50,
     latitude: 40,
-    zoom: 2
+    zoom: 3
 };
 
 export class Map extends React.Component {
@@ -38,7 +38,22 @@ export class Map extends React.Component {
 
       return fetch(mapSource)
         .then(response => response.blob())
-        // .then(buffer => vectorTileToGeoJSON(buffer, x, y, z));
+        .then(response => {
+          const src = URL.createObjectURL(response);
+          const image = new Image();
+  
+          image.src = src;
+          return image;
+          // image.onload = () => {
+          //   image.crossOrigin = '';
+          //   resolve(image);
+          //   URL.revokeObjectURL(src);
+          // };
+  
+          // image.onerror = () => {
+          //   reject(new Error("Can't load image"));
+          // };
+        })
     }
 
     // function vectorTileToGeoJSON(buffer, x, y, z) {
