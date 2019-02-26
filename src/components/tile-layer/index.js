@@ -1,4 +1,4 @@
-import {GeoJsonLayer, CompositeLayer} from 'deck.gl';
+import {CompositeLayer} from 'deck.gl';
 
 import BitmapLayer from 'components/bitmap-layer';
 
