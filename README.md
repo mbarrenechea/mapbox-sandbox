@@ -1,5 +1,8 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Duplicate .env-sample
+First of all duplicate .env-sample and create a file called .env.local
+
 ## Available Scripts
 
 In the project directory, you can run:
