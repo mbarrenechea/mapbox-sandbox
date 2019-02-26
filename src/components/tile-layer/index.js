@@ -75,13 +75,14 @@ export default class TileLayer extends CompositeLayer {
   }
 
   getLayerZoomLevel() {
-    const z = Math.floor(this.context.viewport.zoom);
+    const z = Math.ceil(this.context.viewport.zoom) + 1;
     const {maxZoom, minZoom} = this.props;
     if (maxZoom && parseInt(maxZoom, 10) === maxZoom && z > maxZoom) {
       return maxZoom;
     } else if (minZoom && parseInt(minZoom, 10) === minZoom && z < minZoom) {
       return minZoom;
     }
+
     return z;
   }
 
@@ -109,10 +110,11 @@ export default class TileLayer extends CompositeLayer {
 
       // Supported formats:
       // - Coordinates of the bounding box of the bitmap `[minX, minY, maxX, maxY]`
-      // - Coordinates of four corners of the bitmap, should follow the sequence of `[[minX, minY], [minX, maxY], [maxX, maxY], [maxX, minY]]` 
-      // each position could be `[x, y]` or `[x, y, z]` format. 
+      // - Coordinates of four corners of the bitmap, should follow the sequence of `[[minX, minY], [minX, maxY], [maxX, maxY], [maxX, minY]]`
+      // each position could be `[x, y]` or `[x, y, z]` format.
       return new BitmapLayer({
         id: `${this.id}-${x}-${y}-${z}`,
+        // image: `/test.jpg`,
         image: `https://storage.googleapis.com/wri-public/Hansen17/tiles/hansen_world/v1/tc30/${z}/${x}/${y}.png`,
         bitmapBounds: bounds,
         desaturate: 0,

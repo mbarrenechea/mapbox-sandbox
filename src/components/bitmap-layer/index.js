@@ -194,26 +194,42 @@ export default class BitmapLayer extends Layer {
 
     if (typeof image === 'string') {
       loadImage(image).then(data => {
-        this.setState({bitmapTexture: new Texture2D(gl, { data, border: 0, parameters: {
-          [GL.TEXTURE_MAG_FILTER]: GL.NEAREST,
-          [GL.TEXTURE_MIN_FILTER]: GL.NEAREST,
-          [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
-          [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE
-        } })});
+        this.setState({bitmapTexture: new Texture2D(gl, {
+          data,
+          parameters: {
+            [GL.TEXTURE_MAG_FILTER]: GL.NEAREST,
+            [GL.TEXTURE_MIN_FILTER]: GL.NEAREST,
+            [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
+            [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE
+          },
+          format: GL.RGBA,
+          pixelStore: {
+            [GL.UNPACK_FLIP_Y_WEBGL]: true
+          },
+          mipmaps: true
+        })});
       });
     } else if (image instanceof Texture2D) {
-      this.setState({bitmapTexture: image});
+      this.setState({bitmapTexture: image });
     } else if (
       // browser object
       image instanceof Image ||
       image instanceof HTMLCanvasElement
     ) {
-      this.setState({bitmapTexture: new Texture2D(gl, {data: image, border: 0, parameters: {
-        [GL.TEXTURE_MAG_FILTER]: GL.NEAREST,
-        [GL.TEXTURE_MIN_FILTER]: GL.NEAREST,
-        [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
-        [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE
-      }})});
+      this.setState({bitmapTexture: new Texture2D(gl, {
+        data: image,
+        parameters: {
+          [GL.TEXTURE_MAG_FILTER]: GL.NEAREST,
+          [GL.TEXTURE_MIN_FILTER]: GL.NEAREST,
+          [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
+          [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE
+        },
+        format: GL.RGBA,
+        pixelStore: {
+          [GL.UNPACK_FLIP_Y_WEBGL]: true
+        },
+        mipmaps: true
+      })});
     }
   }
 
