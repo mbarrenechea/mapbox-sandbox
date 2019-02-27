@@ -114,11 +114,11 @@ export default class TileLayer extends CompositeLayer {
 
       return new BitmapLayer({
         id: `${this.id}-${x}-${y}-${z}`,
-        image: `https://api.resourcewatch.org/v1/layer/2c4fde29-1627-40eb-96b5-a9e388f7c7b7/tile/gee/${z}/${x}/${y}`,
+        image: `https://storage.googleapis.com/wri-public/Hansen17/tiles/hansen_world/v1/tc30/${z}/${x}/${y}.png`,
         bitmapBounds: bounds,
         desaturate: 0,
         transparentColor: [0, 0, 0, 0],
-        visible: visible && (!this.state.isLoaded || z === zoomLevel),
+        visible: z === zoomLevel,
         tintColor: [255, 255, 255],
         zoom: zoomLevel,
         endDate: this.props.endDate,

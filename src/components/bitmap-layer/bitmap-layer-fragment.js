@@ -35,14 +35,23 @@ vec4 apply_opacity(vec3 color, float alpha) {
 
 // decode loss layer
 vec4 decodeFunction(vec3 color, float year) {
+  // a value between 0 and 255
   float intensity = color.r * 255.;
-  // float exponent = zoom > 11. ? 0.3 + (zoom - 3.) / 20. : 1.;
+
+  // value to raise to exp
+  float maxExp = exp(zoom < 13. ? 0.3 + (18. - 3.) / 20. : 1.);
+  float minExp = exp(zoom < 13. ? 0.3 + (3. - 3.) / 20. : 1.);
+  float exponent = exp(zoom < 13. ? 0.3 + (zoom - 3.) / 20. : 1.);
+  float scaleIntensity = (exponent - minExp) / (maxExp - minExp);
+
+  // float scaleIntensity = (exponent - 1.2) * 255 / (2.7 - 1.2);
+  float alpha = zoom < 13. ? scaleIntensity * color.r * 255. : color.r * 255.;
 
   if (year >= startDate && year <= endDate && year >= 2001.) {
     color.r = 220. / 255.;
-    color.g = (72. - zoom + 102. - 3. * intensity / zoom) / 255.;
-    color.b = (33. - zoom + 153. - intensity / zoom) / 255.;
-    return vec4(color, color.r > 0.9 ? 0.: color.r);
+    color.g = (72. - zoom + 102. - (3. * (scaleIntensity * color.r)) / zoom) / 255.;
+    color.b = (33. - zoom + 153. - (intensity / zoom)) / 255.;
+    return vec4(color, alpha);
   } else {
     return vec4(0., 0., 0., 0.);
   }
@@ -64,6 +73,6 @@ void main(void) {
   gl_FragColor = picking_filterPickingColor(gl_FragColor);
 
   float year = 2000.0 + (bitmapColor.b * 255.);
-  // gl_FragColor = decodeFunction(bitmapColor.rgb, year);
+  gl_FragColor = decodeFunction(bitmapColor.rgb, year);
 }
 `;
