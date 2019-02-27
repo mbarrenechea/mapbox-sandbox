@@ -75,7 +75,7 @@ export default class TileLayer extends CompositeLayer {
   }
 
   getLayerZoomLevel() {
-    const z = Math.floor(this.context.viewport.zoom);
+    const z = Math.floor(this.context.viewport.zoom) + 1;
     const {maxZoom, minZoom} = this.props;
     if (maxZoom && parseInt(maxZoom, 10) === maxZoom && z > maxZoom) {
       return maxZoom;
@@ -111,6 +111,7 @@ export default class TileLayer extends CompositeLayer {
       // - Coordinates of the bounding box of the bitmap `[minX, minY, maxX, maxY]`
       // - Coordinates of four corners of the bitmap, should follow the sequence of `[[minX, minY], [minX, maxY], [maxX, maxY], [maxX, minY]]` 
       // each position could be `[x, y]` or `[x, y, z]` format. 
+
       return new BitmapLayer({
         id: `${this.id}-${x}-${y}-${z}`,
         image: `https://api.resourcewatch.org/v1/layer/2c4fde29-1627-40eb-96b5-a9e388f7c7b7/tile/gee/${z}/${x}/${y}`,

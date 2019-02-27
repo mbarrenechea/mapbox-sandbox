@@ -1,6 +1,6 @@
 import {lngLatToWorld} from 'viewport-mercator-project';
 
-const TILE_SIZE = 512;
+const TILE_SIZE = 256;
 
 function getBoundingBox(viewport) {
   const corners = [
@@ -28,14 +28,14 @@ function pixelsToTileIndex(a) {
  * return tiles that are on maxZoom.
  */
 export function getTileIndices(viewport, maxZoom, minZoom) {
-  const z = Math.floor(viewport.zoom);
+  const z = Math.floor(viewport.zoom) + 1;
   if (minZoom && z < minZoom) {
     return [];
   }
 
   viewport = new viewport.constructor({
     ...viewport,
-    zoom: z
+    zoom: z - 1
   });
 
   const bbox = getBoundingBox(viewport);
