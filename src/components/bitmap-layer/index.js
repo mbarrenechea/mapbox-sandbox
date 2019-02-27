@@ -192,12 +192,23 @@ export default class BitmapLayer extends Layer {
     const {gl} = this.context;
     const {image} = this.props;
 
+    // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    // gl.enable(gl.BLEND);
+    // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    // gl.depthMask(false);
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+
     const textureOptions = {
       parameters: {
         [GL.TEXTURE_MIN_FILTER]: GL.NEAREST,
         [GL.TEXTURE_MAG_FILTER]: GL.NEAREST,
         [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
-        [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE
+        [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
+      },
+      pixelStore: {
+        [GL.UNPACK_PREMULTIPLY_ALPHA_WEBGL]: true,
+        // [GL.UNPACK_FLIP_Y_WEBGL]: true,
+        // [GL.SRC_ALPHA]: GL.ONE_MINUS_SRC_ALPHA
       },
       mipmaps: false
     }

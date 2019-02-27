@@ -113,7 +113,7 @@ export default class TileLayer extends CompositeLayer {
       // each position could be `[x, y]` or `[x, y, z]` format. 
       return new BitmapLayer({
         id: `${this.id}-${x}-${y}-${z}`,
-        image: `https://storage.googleapis.com/wri-public/Hansen17/tiles/hansen_world/v1/tc30/${z}/${x}/${y}.png`,
+        image: `https://api.resourcewatch.org/v1/layer/2c4fde29-1627-40eb-96b5-a9e388f7c7b7/tile/gee/${z}/${x}/${y}`,
         bitmapBounds: bounds,
         desaturate: 0,
         transparentColor: [0, 0, 0, 0],

@@ -42,7 +42,7 @@ vec4 decodeFunction(vec3 color, float year) {
     color.r = 220. / 255.;
     color.g = (72. - zoom + 102. - 3. * intensity / zoom) / 255.;
     color.b = (33. - zoom + 153. - intensity / zoom) / 255.;
-    return vec4(color, color.r);
+    return vec4(color, color.r > 0.9 ? 0.: color.r);
   } else {
     return vec4(0., 0., 0., 0.);
   }
@@ -64,6 +64,6 @@ void main(void) {
   gl_FragColor = picking_filterPickingColor(gl_FragColor);
 
   float year = 2000.0 + (bitmapColor.b * 255.);
-  gl_FragColor = decodeFunction(bitmapColor.rgb, year);
+  // gl_FragColor = decodeFunction(bitmapColor.rgb, year);
 }
 `;
