@@ -31,9 +31,9 @@ export class Map extends React.Component {
   }
 
   componentDidMount() {
-    setInterval(() => {
-      this.setState(state => ({ endDate: state.endDate >= 2018 ? 2001 : state.endDate + 1 })); 
-    }, 200);
+    // setInterval(() => {
+    //   this.setState(state => ({ endDate: state.endDate >= 2018 ? 2001 : state.endDate + 1 })); 
+    // }, 200);
   }
 
   render() {
