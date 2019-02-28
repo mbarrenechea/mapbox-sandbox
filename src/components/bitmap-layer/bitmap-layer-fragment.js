@@ -33,27 +33,35 @@ vec4 apply_opacity(vec3 color, float alpha) {
   return mix(transparentColor / 255.0, vec4(color, 1.0), alpha);
 }
 
-// decode loss layer
-vec4 decodeFunction(vec3 color, float year) {
-  // a value between 0 and 255
-  float intensity = color.r * 255.;
+float getExponent(float x) {
+  float exponent = x < 13. ? 0.3 + (x - 3.) / 20. : 1.;
+  return exponent;
+}
 
-  // values for creating power scale, domain, and range
-  float exponent = zoom < 13. ? 0.3 + (zoom - 3.) / 20. : 1.;
+float getScaleIntensity(float intensity) {
+  // values for creating power scale, domain (input), and range (output)
+  float exponent = getExponent(zoom);
   float domainMin = 0.;
   float domainMax = 255.;
   float rangeMin = 0.;
   float rangeMax = 255.;
 
   // get the min, max, and current values on the power scale
-  float minPow = pow(domainMin, exponent);
+  float minPow = pow(domainMin, exponent - domainMin);
   float maxPow = pow(domainMax, exponent);
   float currentPow = pow(intensity, exponent);
 
   // get intensity value mapped to range
-  float scaleIntensity = (currentPow - minPow) / (maxPow - minPow) * rangeMax;
+  float scaleIntensity = ((currentPow - minPow) / (maxPow - minPow) * (rangeMax - rangeMin)) + rangeMin;
 
-  // convert scale intensity to alpha
+  return scaleIntensity;
+}
+
+// decode loss layer
+vec4 decodeFunction(vec3 color, float year) {
+  // a value between 0 and 255
+  float intensity = color.r * 255.;
+  float scaleIntensity = getScaleIntensity(intensity);
   float alpha = zoom < 13. ? scaleIntensity / 255. : color.r;
 
   // map to years
