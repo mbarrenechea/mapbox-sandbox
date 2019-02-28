@@ -7,9 +7,9 @@ import TileLayer from 'components/tile-layer';
 const MAPBOX_TOKEN = "pk.eyJ1IjoiYWZpbGF0b3JlOTAiLCJhIjoiY2lqcml0bHoyMDBhZHZwbHhzM2Q1bnRwNSJ9.Zm2C1hNemolKnIAAWquGYg";
 
 const INITIAL_VIEW_STATE = {
-    longitude: -49.4,
-    latitude: -13.96,
-    zoom: 3
+    longitude: -51.76,
+    latitude: -31.21,
+    zoom: 9.9
 };
 
 export class Map extends React.Component {

@@ -91,6 +91,6 @@ void main(void) {
   gl_FragColor = picking_filterPickingColor(gl_FragColor);
 
   float year = 2000.0 + (bitmapColor.b * 255.);
-  gl_FragColor = decodeFunction(bitmapColor.rgb, year);
+  // gl_FragColor = decodeFunction(bitmapColor.rgb, year);
 }
 `;
